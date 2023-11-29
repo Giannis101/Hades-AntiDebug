@@ -3,6 +3,7 @@
 #include "WindowsAPI.hpp"
 
 
+
 SIZE_T Hades::WindowsAPI::VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength)
 {
     SIZE_T written = 0;
