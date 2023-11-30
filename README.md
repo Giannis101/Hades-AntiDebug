@@ -1,4 +1,4 @@
-# Hades - An andvanced and complete anti-debug library for your Windows x64 C++ project
+# Hades - An advanced usermode anti-debug library for your Windows x64 C++ project
 
 ## Usage
 - Easy to use.
