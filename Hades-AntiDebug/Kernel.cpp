@@ -23,3 +23,18 @@ NTSTATUS Hades::Kernel::NtTerminateProcess(HANDLE ProcessHandle, UINT ExitStatus
 {
 	return HadesInternals::Internal_NtTerminateProcess(ProcessHandle, ExitStatus);
 }
+
+NTSTATUS Hades::Kernel::NtOpenProcess(PHANDLE ProcessHandle, ACCESS_MASK DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes, CLIENT_ID* ClientId)
+{
+	return HadesInternals::Internal_NtOpenProcess(ProcessHandle, DesiredAccess, ObjectAttributes, ClientId);
+}
+
+NTSTATUS Hades::Kernel::NtClose(HANDLE Handle)
+{
+	return HadesInternals::Internal_NtClose(Handle);
+}
+
+NTSTATUS Hades::Kernel::NtReadVirtualMemory(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, ULONG NumberOfBytesToRead, PULONG NumberOfBytesReaded)
+{
+	return HadesInternals::Internal_NtReadVirtualMemory(ProcessHandle, BaseAddress, Buffer, NumberOfBytesToRead, NumberOfBytesReaded);
+}

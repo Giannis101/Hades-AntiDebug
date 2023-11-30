@@ -40,3 +40,30 @@ BOOL Hades::WindowsAPI::CheckRemoteDebuggerPresent(HANDLE hProcess, PBOOL pbDebu
 
     return FALSE;
 }
+
+HANDLE Hades::WindowsAPI::OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId)
+{
+    HANDLE handle = NULL;
+    CLIENT_ID clientId{};
+    OBJECT_ATTRIBUTES objAttributes{};
+
+    InitializeObjectAttributes(&objAttributes, NULL, (bInheritHandle ? OBJ_INHERIT : NULL), NULL, NULL);
+    clientId.UniqueProcess = (HANDLE)dwProcessId;
+
+    if (Kernel::NtOpenProcess(&handle, (ACCESS_MASK)dwDesiredAccess, &objAttributes, &clientId) == STATUS_SUCCESS)
+    {
+        return handle;
+    }
+
+    return NULL;
+}
+
+BOOL Hades::WindowsAPI::CloseHandle(HANDLE hObject)
+{
+    if (Kernel::NtClose(hObject) == STATUS_SUCCESS)
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}

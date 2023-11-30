@@ -2,7 +2,6 @@
 
 #include "KernelTypes.hpp"
 
-
 namespace Hades
 {
     namespace Kernel
@@ -50,5 +49,40 @@ namespace Hades
             HANDLE ProcessHandle,
             UINT ExitStatus
         );
+
+
+       /*
+       * Opens a handle to a process object and sets the access rights to this object.
+       * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/nf-ntddk-ntopenprocess
+       */
+        NTSTATUS NtOpenProcess(
+            PHANDLE ProcessHandle,
+            ACCESS_MASK DesiredAccess,
+            POBJECT_ATTRIBUTES ObjectAttributes,
+            CLIENT_ID* ClientId
+        );
+
+
+       /*
+       * Closes the specified handle.
+       * https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntclose
+       */
+        NTSTATUS NtClose(
+            HANDLE Handle
+        );
+
+
+       /*
+       * Similar to ReadProcessMemory.
+       * https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-readprocessmemory
+       */
+        NTSTATUS NtReadVirtualMemory(
+            HANDLE ProcessHandle,
+            PVOID BaseAddress,
+            PVOID Buffer,
+            ULONG NumberOfBytesToRead,
+            PULONG NumberOfBytesReaded
+        );
+        
     }
 }

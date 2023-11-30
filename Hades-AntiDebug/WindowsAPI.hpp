@@ -18,5 +18,15 @@ namespace Hades
             HANDLE hProcess,
             PBOOL pbDebuggerPresent
         );
+
+        HANDLE OpenProcess(
+            DWORD dwDesiredAccess,
+            BOOL bInheritHandle,
+            DWORD dwProcessId
+        );
+        
+        BOOL CloseHandle(
+            HANDLE hObject
+        );
     }
 }
