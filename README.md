@@ -1,7 +1,6 @@
 # Hades - An advanced usermode anti-debug library for your Windows x64 C++ project
 
 ## Usage
-- Easy to use.
 - Detect most of the debugging types (usermode only).
 - Detect all usermode debugger-hide tools and any attempt to hide the presence of debugger.
 - Get access to undocumented kernel functions and bypass usermode hooks (limited).
