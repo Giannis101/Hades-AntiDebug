@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="AntiDebug.hpp" />
     <ClInclude Include="ASMDefines.hpp" />
+    <ClInclude Include="HadesAPI.hpp" />
     <ClInclude Include="Kernel.hpp" />
     <ClInclude Include="KernelTypes.hpp" />
     <ClInclude Include="pch.hpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AntiDebug.cpp" />
+    <ClCompile Include="HadesAPI.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
