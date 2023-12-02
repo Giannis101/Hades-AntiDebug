@@ -45,14 +45,62 @@ namespace Hades
 
 		/*
 		* Returns nullptr if failed, otherwise a buffer to the parent process file name. Don't forget to free the buffer
-		* When a debugger open this application this can retrieve the file name of the debugger.
+		* Can retrieve the file name of the debugger.
 		* includeParentPath includes full path, else only the name of the file:
 		*	with includeParentPath: "C:\\Users\\debug.exe"
 		*	without includeParentPath: "debug.exe"
+		* If a debugger open this application, this function will get its file name. explorer.exe is the defaul when no debugger used.
+		* Avoid using this to debug if application is debugged. Use it only as an optional information for your logs.
 		*/
 		wchar_t* GetParentProcessFileName(
 			bool includeParentPath = true
 		);
 
+
+		/*
+		* Returns nullptr if failed, otherwise a buffer to the parent process file name. Don't forget to free the buffer
+		* Can retrieve the file name of the debugger.
+		* includeParentPath includes full path, else only the name of the file:
+		*	with includeParentPath: "C:\\Users\\debug.exe"
+		*	without includeParentPath: "debug.exe"
+		* If a debugger open the target application, this function will get its file name. explorer.exe is the defaul when no debugger used.
+		* Avoid using this to debug if application is debugged. Use it only as an optional information for your logs.
+		*/
+		wchar_t* GetParentProcessFileName(
+			HANDLE process,
+			bool includeParentPath = true
+		);
+
+
+		/*
+		* Returns true if termination request succeed, otherwise it returns false.
+		* exitCode is the process exit reason.
+		* Can use this function to termintate the debugger process that debugging the current application.
+		* Should check if the parent is not explorer.exe, as may cause problem if close a windows process.
+		*/
+		bool TerminateParentProcess(
+			int exitCode = 0
+		);
+
+
+		/*
+		* Returns true if termination request succeed, otherwise it returns false.
+		* exitCode is the process exit reason.
+		* Can use this function to termintate the debugger process that debugging the current application.
+		* Should check if the parent is not explorer.exe, as may cause problem if close a windows process.
+		*/
+		bool TerminateParentProcess(
+			HANDLE process,
+			int exitCode = 0
+		);
+
+
+		/*
+		* Close instantly the currect application.
+		* exitCode is the exit reason.
+		*/
+		void TerminateCurrentProcess(
+			int exitCode = 0
+		);
 	}
 }

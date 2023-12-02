@@ -17,6 +17,7 @@ void PrintBool(const char* description, bool result)
 	std::cout << description << " : " << (result ? "YES" : "NO") << std::endl;
 }
 
+//This function using normal windows API to get parent process name. Debugger-hide tools can spoof this to looks like its opened without any debugger.
 wchar_t* Windows_GetParentProcessFileName()
 {
 	DWORD pid = GetCurrentProcessId();
@@ -91,7 +92,6 @@ int main()
 			delete[] debugName;
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
 
 		Sleep(1000);
 		system("cls"); //clear console

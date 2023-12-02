@@ -40,6 +40,11 @@ bool Hades::AntiDebug::HasDetectedProcessDebugObject(HANDLE process)
 
 wchar_t* Hades::AntiDebug::GetParentProcessFileName(bool includeParentPath)
 {
+    return GetParentProcessFileName(Kernel::NtCurrentProcess(), includeParentPath);
+}
+
+wchar_t* Hades::AntiDebug::GetParentProcessFileName(HANDLE process, bool includeParentPath)
+{
     if (DWORD pid = HadesAPI::GetParentProcessProcessId())
     {
         if (HANDLE parentProcess = WindowsAPI::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid))
@@ -51,4 +56,29 @@ wchar_t* Hades::AntiDebug::GetParentProcessFileName(bool includeParentPath)
     }
 
     return nullptr;
+}
+
+bool Hades::AntiDebug::TerminateParentProcess(int exitCode)
+{
+    return TerminateParentProcess(Kernel::NtCurrentProcess(), exitCode);
+}
+
+bool Hades::AntiDebug::TerminateParentProcess(HANDLE process, int exitCode)
+{
+    if (DWORD pid = HadesAPI::GetParentProcessProcessId(process))
+    {
+        if (HANDLE parentProcess = WindowsAPI::OpenProcess(PROCESS_TERMINATE, FALSE, pid))
+        {
+            bool result = (Kernel::NtTerminateProcess(parentProcess, (UINT)exitCode) == STATUS_SUCCESS);
+            WindowsAPI::CloseHandle(parentProcess);
+            return result;
+        }
+    }
+
+    return false;
+}
+
+void Hades::AntiDebug::TerminateCurrentProcess(int exitCode)
+{
+    Kernel::NtTerminateProcess(Kernel::NtCurrentProcess(), (UINT)exitCode);
 }
