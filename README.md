@@ -3,6 +3,7 @@
 ## Usage
 - Detect most of the debugging types (usermode only).
 - Bypass and detect all usermode debugger-hide tools and any attempt to hide the presence of debugger.
+- Get detailed information and take control for debug tools used.
 - Get access to undocumented kernel functions and bypass usermode hooks (limited).
 - Call Windows API functions safely: Bypass IAT (import address table) manipulation and other usermode hooks on Windows API functions (limited).
 
