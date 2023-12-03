@@ -42,4 +42,18 @@ Internal_NtReadVirtualMemory proc
     ret
 Internal_NtReadVirtualMemory endp
 
+Internal_NtAllocateVirtualMemory proc
+    mov r10,rcx
+    mov eax, 24
+    syscall
+    ret
+Internal_NtAllocateVirtualMemory endp
+
+Internal_NtFreeVirtualMemory proc
+    mov r10,rcx
+    mov eax, 30
+    syscall
+    ret
+Internal_NtFreeVirtualMemory endp
+
 end

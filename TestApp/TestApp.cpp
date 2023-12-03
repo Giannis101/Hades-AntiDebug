@@ -17,6 +17,40 @@ void PrintBool(const char* description, bool result)
 	std::cout << description << " : " << (result ? "YES" : "NO") << std::endl;
 }
 
+bool Windows_HasDetectedProcessDebugFlags()
+{
+	if (HMODULE nttdll = GetModuleHandleA("ntdll.dll"))
+	{
+		using fpNtQueryInformationProcess = NTSTATUS(NTAPI*)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
+		auto NtQueryInformationProcess = (fpNtQueryInformationProcess)GetProcAddress(nttdll, "NtQueryInformationProcess");
+
+		ULONG processDebugFlags = NULL;
+		if (NtQueryInformationProcess(GetCurrentProcess(), (PROCESSINFOCLASS)0x1F, &processDebugFlags, sizeof(ULONG), NULL) == STATUS_SUCCESS)
+		{
+			return processDebugFlags == NULL;
+		}
+	}
+	
+	return false;
+}
+
+bool Windows_HasDetectedProcessDebugObject()
+{
+	if (HMODULE nttdll = GetModuleHandleA("ntdll.dll"))
+	{
+		using fpNtQueryInformationProcess = NTSTATUS(NTAPI*)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
+		auto NtQueryInformationProcess = (fpNtQueryInformationProcess)GetProcAddress(nttdll, "NtQueryInformationProcess");
+
+		HANDLE processDebugObjectHandle = NULL;
+		if (NtQueryInformationProcess(GetCurrentProcess(), (PROCESSINFOCLASS)0x1E, &processDebugObjectHandle, sizeof(HANDLE), NULL) == STATUS_SUCCESS)
+		{
+			return processDebugObjectHandle != NULL;
+		}
+	}
+
+	return false;
+}
+
 //This function using normal windows API to get parent process name. Debugger-hide tools can spoof this to looks like its opened without any debugger.
 wchar_t* Windows_GetParentProcessFileName()
 {
@@ -52,6 +86,8 @@ wchar_t* Windows_GetParentProcessFileName()
 }
 
 
+
+
 int main()
 {
 	while (true)
@@ -61,9 +97,10 @@ int main()
 		///////////////////////////////////////////////////////////////  HADES  ///////////////////////////////////////////////////////////////
 		PrintBool("Hades - HasDetectedProcessDebugFlags", Hades::AntiDebug::HasDetectedProcessDebugFlags());
 		PrintBool("Hades - HasDetectedProcessDebugObject", Hades::AntiDebug::HasDetectedProcessDebugObject());
+		//PrintBool("Hades - HasDetectedHardwareBreakpoints", Hades::AntiDebug::HasDetectedHardwareBreakpoints());
 
 		BOOL hadesRemoteDebug = FALSE;
-		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades
+		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades. Not recommented, attackers can still spoof it
 		{
 			PrintBool("Hades (WindowsAPI) - HasDetectedProcessDebugObject", (bool)hadesRemoteDebug);
 		}
@@ -78,6 +115,9 @@ int main()
 		std::cout << std::endl << std::endl;
 
 		////////////////////////////////////////////////////////////  WINDOWS  ////////////////////////////////////////////////////////////////
+		PrintBool("Windows - HasDetectedProcessDebugFlags", Windows_HasDetectedProcessDebugFlags());
+		PrintBool("Windows - HasDetectedProcessDebugObject", Windows_HasDetectedProcessDebugObject());
+
 		BOOL normalRemoteDebug = FALSE;
 		if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &normalRemoteDebug)) //call CheckRemoteDebuggerPresent normally
 		{
@@ -92,6 +132,18 @@ int main()
 			delete[] debugName;
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		std::cout << std::endl << std::endl;
+
+		//a simple test to detect if a debugger-hide tool is currently used to hide the debugger
+		bool windowsDetectedDebug = Windows_HasDetectedProcessDebugFlags() || Windows_HasDetectedProcessDebugObject();
+		bool hadesDetectedDebug = Hades::AntiDebug::HasDetectedProcessDebugFlags() || Hades::AntiDebug::HasDetectedProcessDebugObject();
+
+		if (hadesDetectedDebug && !windowsDetectedDebug)
+		{
+			std::cout << "Debugger-hide tool/s detected" << std::endl;
+		}
+
 
 		Sleep(1000);
 		system("cls"); //clear console

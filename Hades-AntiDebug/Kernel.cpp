@@ -38,3 +38,13 @@ NTSTATUS Hades::Kernel::NtReadVirtualMemory(HANDLE ProcessHandle, PVOID BaseAddr
 {
 	return HadesInternals::Internal_NtReadVirtualMemory(ProcessHandle, BaseAddress, Buffer, NumberOfBytesToRead, NumberOfBytesReaded);
 }
+
+NTSTATUS Hades::Kernel::NtAllocateVirtualMemory(HANDLE ProcessHandle, PVOID* BaseAddress, ULONG_PTR ZeroBits, PSIZE_T RegionSize, ULONG AllocationType, ULONG Protect)
+{
+	return HadesInternals::Internal_NtAllocateVirtualMemory(ProcessHandle, BaseAddress, ZeroBits, RegionSize, AllocationType, Protect);
+}
+
+NTSTATUS Hades::Kernel::NtFreeVirtualMemory(HANDLE ProcessHandle, PVOID* BaseAddress, PSIZE_T RegionSize, ULONG FreeType)
+{
+	return HadesInternals::Internal_NtFreeVirtualMemory(ProcessHandle, BaseAddress, RegionSize, FreeType);
+}

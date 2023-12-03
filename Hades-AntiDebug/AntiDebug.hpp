@@ -44,6 +44,23 @@ namespace Hades
 
 
 		/*
+		* Returns true if any hardware breakpoint detected in remote process.
+		* process: handle of remote process.
+		* Silent checks, not throwing exceptions.
+		*/
+		/*bool HasDetectedHardwareBreakpoints(
+			HANDLE process
+		);*/
+
+
+		/*
+		* Returns true if any hardware breakpoint detected in local process.
+		* Silent checks, not throwing exceptions.
+		*/
+		//bool HasDetectedHardwareBreakpoints();
+
+
+		/*
 		* Returns nullptr if failed, otherwise a buffer to the parent process file name. Don't forget to free the buffer
 		* Can retrieve the file name of the debugger.
 		* includeParentPath includes full path, else only the name of the file:

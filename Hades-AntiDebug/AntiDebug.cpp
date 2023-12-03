@@ -38,6 +38,41 @@ bool Hades::AntiDebug::HasDetectedProcessDebugObject(HANDLE process)
     return false;
 }
 
+//bool Hades::AntiDebug::HasDetectedHardwareBreakpoints(HANDLE process)
+//{
+//    bool result = false;
+//
+//    LPVOID baseAddress = NULL;
+//    SIZE_T regionSize = sizeof(CONTEXT);
+//    if (Kernel::NtAllocateVirtualMemory(process, &baseAddress, NULL, &regionSize, MEM_COMMIT, PAGE_READWRITE) == STATUS_SUCCESS)
+//    {
+//        PCONTEXT context = (PCONTEXT)baseAddress;
+//
+//        if (context && regionSize >= sizeof(CONTEXT))
+//        {
+//            context->ContextFlags = CONTEXT_DEBUG_REGISTERS;
+//
+//            if (GetThreadContext(GetCurrentThread(), context))
+//            {
+//                //not sure if should also check Dr6 and Dr7
+//                if (context->Dr0 != 0ull || context->Dr1 != 0ull || context->Dr2 != 0ull || context->Dr3 != 0ull)
+//                {
+//                    result = true;
+//                }
+//            }
+//
+//            Kernel::NtFreeVirtualMemory(process, &baseAddress, 0, MEM_RELEASE);
+//        }
+//    }
+//
+//    return result;
+//}
+//
+//bool Hades::AntiDebug::HasDetectedHardwareBreakpoints()
+//{
+//    return HasDetectedHardwareBreakpoints(Kernel::NtCurrentProcess());
+//}
+
 wchar_t* Hades::AntiDebug::GetParentProcessFileName(bool includeParentPath)
 {
     return GetParentProcessFileName(Kernel::NtCurrentProcess(), includeParentPath);

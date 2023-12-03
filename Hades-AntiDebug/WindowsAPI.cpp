@@ -41,6 +41,12 @@ BOOL Hades::WindowsAPI::CheckRemoteDebuggerPresent(HANDLE hProcess, PBOOL pbDebu
     return FALSE;
 }
 
+BOOL Hades::WindowsAPI::IsDebuggerPresent()
+{
+    PPEB pPeb = (PPEB)__readgsqword(0x60);
+    return pPeb->BeingDebugged;
+}
+
 HANDLE Hades::WindowsAPI::OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId)
 {
     HANDLE handle = NULL;
@@ -67,3 +73,21 @@ BOOL Hades::WindowsAPI::CloseHandle(HANDLE hObject)
 
     return FALSE;
 }
+
+//LPVOID Hades::WindowsAPI::VirtualAllocExNuma(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect, DWORD nndPreferred)
+//{
+//    LPVOID baseAddress = lpAddress;
+//    SIZE_T regionSize = dwSize;
+//    if (Kernel::NtAllocateVirtualMemory(hProcess, &baseAddress, NULL, &regionSize, (ULONG)flAllocationType, (ULONG)flProtect) == STATUS_SUCCESS)
+//    {
+//        return baseAddress;
+//    }
+//
+//    return NULL;
+//}
+//
+//LPVOID Hades::WindowsAPI::VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect)
+//{
+//    return VirtualAllocExNuma(hProcess, lpAddress, dwSize, flAllocationType, flProtect, 0xFFFFFFFF);
+//}
+

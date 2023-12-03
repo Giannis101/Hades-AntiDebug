@@ -84,5 +84,31 @@ namespace Hades
             PULONG NumberOfBytesReaded
         );
         
+
+       /*
+       * Reserves, commits, or both, a region of pages within the user-mode virtual address space of a specified process.
+       * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntallocatevirtualmemory
+       */
+        NTSTATUS NtAllocateVirtualMemory(
+            HANDLE ProcessHandle,
+            PVOID* BaseAddress,
+            ULONG_PTR ZeroBits,
+            PSIZE_T RegionSize,
+            ULONG AllocationType,
+            ULONG Protect
+        );
+
+
+        /*
+       * Releases, decommits, or both releases and decommits, a region of pages within the virtual address space of a specified process.
+       * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntfreevirtualmemory
+       */
+        NTSTATUS NtFreeVirtualMemory(
+            HANDLE ProcessHandle,
+            PVOID* BaseAddress,
+            PSIZE_T RegionSize,
+            ULONG FreeType
+        );
+
     }
 }

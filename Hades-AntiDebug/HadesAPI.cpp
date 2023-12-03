@@ -16,42 +16,43 @@ wchar_t* Hades::HadesAPI::GetProcessFileName(HANDLE process, bool copy, bool inc
 	{
 		USHORT wcharsCount = name.Length / sizeof(wchar_t);
 
-		wchar_t* resultWstr = (wchar_t*)name.Buffer;
-
-		if (copy)
+		if (wchar_t* resultWstr = (wchar_t*)name.Buffer)
 		{
-			if (resultWstr = new wchar_t[wcharsCount + 1])
+			if (copy)
 			{
-				for (USHORT x = 0; x != wcharsCount + 1; x++)
+				if (resultWstr = new wchar_t[wcharsCount + 1])
 				{
-					resultWstr[x] = name.Buffer[x];
-				}
-			}
-			else
-			{
-				return nullptr;
-			}
-		}
-		
-		if (!includeParentPath)
-		{
-			for (int x = wcharsCount; x != -1; x--)
-			{
-				if (resultWstr[x] == L'/' || resultWstr[x] == L'\\')
-				{
-					USHORT delta = (USHORT)x + 1;
-					USHORT len = wcharsCount - (USHORT)x;
-					for (USHORT nx = 0ui16; nx != len; nx++)
+					for (USHORT x = 0; x != wcharsCount + 1; x++)
 					{
-						resultWstr[nx] = resultWstr[delta + nx];
+						resultWstr[x] = name.Buffer[x];
 					}
-
-					break;
+				}
+				else
+				{
+					return nullptr;
 				}
 			}
+
+			if (!includeParentPath)
+			{
+				for (int x = wcharsCount; x != -1; x--)
+				{
+					if (resultWstr[x] == L'/' || resultWstr[x] == L'\\')
+					{
+						USHORT delta = (USHORT)x + 1;
+						USHORT len = wcharsCount - (USHORT)x;
+						for (USHORT nx = 0ui16; nx != len; nx++)
+						{
+							resultWstr[nx] = resultWstr[delta + nx];
+						}
+
+						break;
+					}
+				}
+			}
+
+			return resultWstr;
 		}
-		
-		return resultWstr;
 	}
 
 	return nullptr;
