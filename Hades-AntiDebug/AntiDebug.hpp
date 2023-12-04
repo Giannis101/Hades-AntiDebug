@@ -44,20 +44,10 @@ namespace Hades
 
 
 		/*
-		* Returns true if any hardware breakpoint detected in remote process.
-		* process: handle of remote process.
+		* Returns true if any hardware or software (INT3) breakpoint detected in local application.
 		* Silent checks, not throwing exceptions.
 		*/
-		/*bool HasDetectedHardwareBreakpoints(
-			HANDLE process
-		);*/
-
-
-		/*
-		* Returns true if any hardware breakpoint detected in local process.
-		* Silent checks, not throwing exceptions.
-		*/
-		//bool HasDetectedHardwareBreakpoints();
+		bool HasDetectedHardwareBreakpoints();
 
 
 		/*
@@ -68,6 +58,7 @@ namespace Hades
 		*	without includeParentPath: "debug.exe"
 		* If a debugger open this application, this function will get its file name. explorer.exe is the defaul when no debugger used.
 		* Avoid using this to debug if application is debugged. Use it only as an optional information for your logs.
+		* Silent checks, not throwing exceptions.
 		*/
 		wchar_t* GetParentProcessFileName(
 			bool includeParentPath = true
@@ -82,6 +73,7 @@ namespace Hades
 		*	without includeParentPath: "debug.exe"
 		* If a debugger open the target application, this function will get its file name. explorer.exe is the defaul when no debugger used.
 		* Avoid using this to debug if application is debugged. Use it only as an optional information for your logs.
+		* Silent checks, not throwing exceptions.
 		*/
 		wchar_t* GetParentProcessFileName(
 			HANDLE process,
@@ -94,6 +86,7 @@ namespace Hades
 		* exitCode is the process exit reason.
 		* Can use this function to termintate the debugger process that debugging the current application.
 		* Should check if the parent is not explorer.exe, as may cause problem if close a windows process.
+		* Silent, not throwing exceptions and cannot debugged and found easy.
 		*/
 		bool TerminateParentProcess(
 			int exitCode = 0
@@ -105,6 +98,7 @@ namespace Hades
 		* exitCode is the process exit reason.
 		* Can use this function to termintate the debugger process that debugging the current application.
 		* Should check if the parent is not explorer.exe, as may cause problem if close a windows process.
+		* Silent, not throwing exceptions and cannot debugged and found easy.
 		*/
 		bool TerminateParentProcess(
 			HANDLE process,
@@ -115,6 +109,7 @@ namespace Hades
 		/*
 		* Close instantly the currect application.
 		* exitCode is the exit reason.
+		* Silent, not throwing exceptions and cannot debugged and found easy.
 		*/
 		void TerminateCurrentProcess(
 			int exitCode = 0

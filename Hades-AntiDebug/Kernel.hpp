@@ -15,6 +15,14 @@ namespace Hades
 
 
         /*
+        * Returns a special handle value that represents the current thread.
+        * The returned value is not a true handle, but it is a special value that always represents the current thread.
+        * https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/zwcurrentthread
+        */
+        HANDLE NtCurrentThread();
+
+
+        /*
         * Determines the state, protection, and type of a region of pages within the virtual address space of the specified process.
         * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntqueryvirtualmemory
         */
@@ -99,7 +107,7 @@ namespace Hades
         );
 
 
-        /*
+       /*
        * Releases, decommits, or both releases and decommits, a region of pages within the virtual address space of a specified process.
        * https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntfreevirtualmemory
        */
@@ -108,6 +116,16 @@ namespace Hades
             PVOID* BaseAddress,
             PSIZE_T RegionSize,
             ULONG FreeType
+        );
+
+
+       /*
+       * Similar to GetThreadContext.
+       * https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadcontext
+       */
+        NTSTATUS NtGetContextThread(
+            HANDLE ThreadHandle,
+            PCONTEXT Context
         );
 
     }

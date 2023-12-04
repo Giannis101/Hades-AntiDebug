@@ -9,6 +9,11 @@ HANDLE Hades::Kernel::NtCurrentProcess()
 	return (HANDLE)0xFFFFFFFFFFFFFFFF;
 }
 
+HANDLE Hades::Kernel::NtCurrentThread()
+{
+	return (HANDLE)0xFFFFFFFFFFFFFFFE;
+}
+
 NTSTATUS Hades::Kernel::NtQueryVirtualMemory(HANDLE ProcessHandle, PVOID BaseAddress, MEMORY_INFORMATION_CLASS MemoryInformationClass, PVOID MemoryInformation, SIZE_T MemoryInformationLength, PSIZE_T ReturnLength)
 {
 	return HadesInternals::Internal_NtQueryVirtualMemory(ProcessHandle, BaseAddress, MemoryInformationClass, MemoryInformation, MemoryInformationLength, ReturnLength);
@@ -47,4 +52,9 @@ NTSTATUS Hades::Kernel::NtAllocateVirtualMemory(HANDLE ProcessHandle, PVOID* Bas
 NTSTATUS Hades::Kernel::NtFreeVirtualMemory(HANDLE ProcessHandle, PVOID* BaseAddress, PSIZE_T RegionSize, ULONG FreeType)
 {
 	return HadesInternals::Internal_NtFreeVirtualMemory(ProcessHandle, BaseAddress, RegionSize, FreeType);
+}
+
+NTSTATUS Hades::Kernel::NtGetContextThread(HANDLE ThreadHandle, PCONTEXT Context)
+{
+	return HadesInternals::Internal_NtGetContextThread(ThreadHandle, Context);
 }

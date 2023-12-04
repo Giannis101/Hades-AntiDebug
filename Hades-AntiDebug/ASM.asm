@@ -56,4 +56,11 @@ Internal_NtFreeVirtualMemory proc
     ret
 Internal_NtFreeVirtualMemory endp
 
+Internal_NtGetContextThread proc
+    mov r10,rcx
+    mov eax, 249
+    syscall
+    ret
+Internal_NtGetContextThread endp
+
 end

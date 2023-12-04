@@ -51,6 +51,26 @@ bool Windows_HasDetectedProcessDebugObject()
 	return false;
 }
 
+bool Windows_HasDetectedHardwareBreakpoints()
+{
+	bool result = false;
+
+	if (PCONTEXT context = (PCONTEXT)VirtualAlloc(NULL, sizeof(CONTEXT), MEM_COMMIT, PAGE_READWRITE))
+	{
+		context->ContextFlags = CONTEXT_DEBUG_REGISTERS;
+
+		if (GetThreadContext(GetCurrentThread(), context))
+		{
+			//not sure if should also check Dr6 and Dr7
+			result = (context->Dr0 != 0ull || context->Dr1 != 0ull || context->Dr2 != 0ull || context->Dr3 != 0ull);
+		}
+
+		VirtualFree(context, 0, MEM_RELEASE);
+	}
+
+	return result;
+}
+
 //This function using normal windows API to get parent process name. Debugger-hide tools can spoof this to looks like its opened without any debugger.
 wchar_t* Windows_GetParentProcessFileName()
 {
@@ -97,13 +117,15 @@ int main()
 		///////////////////////////////////////////////////////////////  HADES  ///////////////////////////////////////////////////////////////
 		PrintBool("Hades - HasDetectedProcessDebugFlags", Hades::AntiDebug::HasDetectedProcessDebugFlags());
 		PrintBool("Hades - HasDetectedProcessDebugObject", Hades::AntiDebug::HasDetectedProcessDebugObject());
-		//PrintBool("Hades - HasDetectedHardwareBreakpoints", Hades::AntiDebug::HasDetectedHardwareBreakpoints());
+		PrintBool("Hades - HasDetectedHardwareBreakpoints", Hades::AntiDebug::HasDetectedHardwareBreakpoints());
 
 		BOOL hadesRemoteDebug = FALSE;
 		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades. Not recommented, attackers can still spoof it
 		{
-			PrintBool("Hades (WindowsAPI) - HasDetectedProcessDebugObject", (bool)hadesRemoteDebug);
+			PrintBool("Hades (WindowsAPI) - CheckRemoteDebuggerPresent", (bool)hadesRemoteDebug);
 		}
+
+		PrintBool("Hades (WindowsAPI) - IsDebuggerPresent", Hades::WindowsAPI::IsDebuggerPresent());
 
 		if (wchar_t* debugName = Hades::AntiDebug::GetParentProcessFileName())
 		{
@@ -117,11 +139,12 @@ int main()
 		////////////////////////////////////////////////////////////  WINDOWS  ////////////////////////////////////////////////////////////////
 		PrintBool("Windows - HasDetectedProcessDebugFlags", Windows_HasDetectedProcessDebugFlags());
 		PrintBool("Windows - HasDetectedProcessDebugObject", Windows_HasDetectedProcessDebugObject());
+		PrintBool("Windows - HasDetectedHardwareBreakpoints", Windows_HasDetectedHardwareBreakpoints());
 
 		BOOL normalRemoteDebug = FALSE;
 		if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &normalRemoteDebug)) //call CheckRemoteDebuggerPresent normally
 		{
-			PrintBool("Windows - HasDetectedProcessDebugObject", (bool)normalRemoteDebug);
+			PrintBool("Windows - CheckRemoteDebuggerPresent", (bool)normalRemoteDebug);
 		}
 
 		PrintBool("Windows - IsDebuggerPresent", IsDebuggerPresent());

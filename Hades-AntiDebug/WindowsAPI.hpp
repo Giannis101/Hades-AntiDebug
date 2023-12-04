@@ -37,6 +37,15 @@ namespace Hades
 			HANDLE hObject
 		);
 
+		HANDLE GetCurrentThread();
+
+		HANDLE GetCurrentProcess();
+		
+		BOOL GetThreadContext(
+			HANDLE hThread,
+			LPCONTEXT lpContext
+		);
+
 		/*LPVOID VirtualAllocExNuma(
 			HANDLE hProcess,
 			LPVOID lpAddress,

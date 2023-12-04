@@ -74,6 +74,26 @@ BOOL Hades::WindowsAPI::CloseHandle(HANDLE hObject)
     return FALSE;
 }
 
+HANDLE Hades::WindowsAPI::GetCurrentThread()
+{
+    return Kernel::NtCurrentThread();
+}
+
+HANDLE Hades::WindowsAPI::GetCurrentProcess()
+{
+    return Kernel::NtCurrentProcess();
+}
+
+BOOL Hades::WindowsAPI::GetThreadContext(HANDLE hThread, LPCONTEXT lpContext)
+{
+    if (Kernel::NtGetContextThread(hThread, lpContext) == STATUS_SUCCESS)
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 //LPVOID Hades::WindowsAPI::VirtualAllocExNuma(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect, DWORD nndPreferred)
 //{
 //    LPVOID baseAddress = lpAddress;
