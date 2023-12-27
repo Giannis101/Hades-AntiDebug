@@ -20,7 +20,7 @@ There are available examples in TestApp project.
 
 
 ## Warning: This is for educational purposes only!
-The security is based on Windows kernel. Hades makes calls to kernel with the lowest possible way that usermode allows. Any future Windows update may cause failure or even generate false detections from this library. However it tested and working on both Windows 10 and 11 versions. Not tested on older windows versions
+The security is based on Windows kernel. Hades do calls to the kernel with the lowest possible way that usermode allows. Any future Windows update may cause failure or even generate false detections from this library. However it tested and working on both Windows 10 and 11 versions. Not tested on older windows versions
 
 
 To protect your application from reverse engineering, you will need more than just debugging detection. Unfortunately detecting debuggers from usermode is very weak because advanced attackers can find them very easy and bypass them or sometimes they not even need to debug it.
