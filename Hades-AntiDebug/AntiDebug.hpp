@@ -1,5 +1,4 @@
-#include <string>
-
+#pragma once
 
 namespace Hades
 {
@@ -53,6 +52,7 @@ namespace Hades
 		/*
 		* Returns nullptr if failed, otherwise a buffer to the parent process file name. Don't forget to free the buffer
 		* Can retrieve the file name of the debugger.
+		* You have to free the returned buffer with 'delete[]' when you done using it.
 		* includeParentPath includes full path, else only the name of the file:
 		*	with includeParentPath: "C:\\Users\\debug.exe"
 		*	without includeParentPath: "debug.exe"
@@ -68,7 +68,9 @@ namespace Hades
 		/*
 		* Returns nullptr if failed, otherwise a buffer to the parent process file name. Don't forget to free the buffer
 		* Can retrieve the file name of the debugger.
-		* includeParentPath includes full path, else only the name of the file:
+		* You have to free the returned buffer with 'delete[]' when you done using it.
+		* process: for which process to check. Use it only if want get parent process name of a remote process
+		* includeParentPath: includes full path, else only the name of the file:
 		*	with includeParentPath: "C:\\Users\\debug.exe"
 		*	without includeParentPath: "debug.exe"
 		* If a debugger open the target application, this function will get its file name. explorer.exe is the defaul when no debugger used.

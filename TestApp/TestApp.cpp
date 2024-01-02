@@ -110,6 +110,10 @@ wchar_t* Windows_GetParentProcessFileName()
 
 int main()
 {
+	//This is a comparison between common anti-debug techniques and Hades.
+	//Hades is able to bypass and detect any private or public debug-hide tool.
+	//It can detect any usermode debugger like Windows, x64dbg, IDA and special debuging tools like Cheat engine's VEH (Hardware breakpoints, Int3 instructions)
+
 	while (true)
 	{
 		std::cout << "Checking if debugger is present in this process" << std::endl << std::endl;
@@ -120,7 +124,7 @@ int main()
 		PrintBool("Hades - HasDetectedHardwareBreakpoints", Hades::AntiDebug::HasDetectedHardwareBreakpoints());
 
 		BOOL hadesRemoteDebug = FALSE;
-		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades. Not recommented, attackers can still spoof it
+		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(Hades::WindowsAPI::GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades. Not recommented, attackers can still spoof it
 		{
 			PrintBool("Hades (WindowsAPI) - CheckRemoteDebuggerPresent", (bool)hadesRemoteDebug);
 		}

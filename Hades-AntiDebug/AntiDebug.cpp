@@ -71,11 +71,11 @@ wchar_t* Hades::AntiDebug::GetParentProcessFileName(bool includeParentPath)
 
 wchar_t* Hades::AntiDebug::GetParentProcessFileName(HANDLE process, bool includeParentPath)
 {
-    if (DWORD pid = HadesAPI::GetParentProcessProcessId())
+    if (DWORD pid = HadesAPI::GetParentProcessProcessId(process))
     {
         if (HANDLE parentProcess = WindowsAPI::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid))
         {
-            wchar_t* result = HadesAPI::GetProcessFileName(parentProcess, true, includeParentPath);
+            wchar_t* result = HadesAPI::GetProcessFileName(parentProcess, includeParentPath);
             WindowsAPI::CloseHandle(parentProcess);
             return result;
         }

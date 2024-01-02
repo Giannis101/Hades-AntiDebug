@@ -5,53 +5,53 @@
 
 
 
-wchar_t* Hades::HadesAPI::GetProcessFileName(HANDLE process, bool copy, bool includeParentPath)
+wchar_t* Hades::HadesAPI::GetProcessFileName(HANDLE process, bool includeParentPath)
 {
-	//this actually init UNICODE_STRING correctly.
-	UNICODE_STRING name{};
+	//this looks like it works... ProcessImageFileNameWin32 have to write in stack for some reason.
+	WCHAR stackBuffer[MAX_PATH + 1];
 
-	//ProcessImageFileNameWin32 returns a null-terminated unicode string. Also returns the same address everytime, so no need free anything.
-	//Can edit the container of buffer freely but when ProcessImageFileNameWin32 re-called will replace the changes.
-	if (Kernel::NtQueryInformationProcess(process, PROCESSINFOCLASS::ProcessImageFileNameWin32, &name, MAXSHORT, NULL) == STATUS_SUCCESS)
+	UNICODE_STRING name;
+	name.Buffer = stackBuffer;
+	name.MaximumLength = sizeof(stackBuffer);
+	name.Length = 0;
+
+	//ProcessInformationLength is the total size of (UNICODE_STRING + stackBuffer) in bytes.
+	//It will zero the buffer automatically before write to it, so the string will be null-terminated.
+	if (Kernel::NtQueryInformationProcess(process, PROCESSINFOCLASS::ProcessImageFileNameWin32, &name, sizeof(stackBuffer) + sizeof(UNICODE_STRING), NULL) == STATUS_SUCCESS)
 	{
 		USHORT wcharsCount = name.Length / sizeof(wchar_t);
 
-		if (wchar_t* resultWstr = (wchar_t*)name.Buffer)
+		if (name.Buffer && wcharsCount)
 		{
-			if (copy)
+			if (wchar_t* resultWstr = new wchar_t[3 * wcharsCount + 1])
 			{
-				if (resultWstr = new wchar_t[wcharsCount + 1])
+				//copy buffer
+				for (USHORT x = 0; x != wcharsCount + 1; x++)
 				{
-					for (USHORT x = 0; x != wcharsCount + 1; x++)
-					{
-						resultWstr[x] = name.Buffer[x];
-					}
+					resultWstr[x] = name.Buffer[x];
 				}
-				else
-				{
-					return nullptr;
-				}
-			}
 
-			if (!includeParentPath)
-			{
-				for (int x = wcharsCount; x != -1; x--)
+				//remove parent path if need
+				if (!includeParentPath)
 				{
-					if (resultWstr[x] == L'/' || resultWstr[x] == L'\\')
+					for (int x = wcharsCount; x != -1; x--)
 					{
-						USHORT delta = (USHORT)x + 1;
-						USHORT len = wcharsCount - (USHORT)x;
-						for (USHORT nx = 0ui16; nx != len; nx++)
+						if (resultWstr[x] == L'/' || resultWstr[x] == L'\\')
 						{
-							resultWstr[nx] = resultWstr[delta + nx];
-						}
+							USHORT delta = (USHORT)x + 1;
+							USHORT len = wcharsCount - (USHORT)x;
+							for (USHORT nx = 0ui16; nx != len; nx++)
+							{
+								resultWstr[nx] = resultWstr[delta + nx];
+							}
 
-						break;
+							break;
+						}
 					}
 				}
-			}
 
-			return resultWstr;
+				return resultWstr;
+			}
 		}
 	}
 
