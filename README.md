@@ -9,7 +9,7 @@
 
 
 ## How to use
-- Built the library
+- Built the library, depending on your project preferences
 - Include library in your project
 - Include the headers you want to use. You have these options:
   - AntiDebug.hpp contains ready-to-use anti-debug functions for self and remote process. If you not searching for anything more advanced than that, this is the only header you have to include.
