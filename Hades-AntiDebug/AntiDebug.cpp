@@ -19,7 +19,7 @@ bool Hades::AntiDebug::HasDetectedProcessDebugObject()
 bool Hades::AntiDebug::HasDetectedProcessDebugFlags(HANDLE process)
 {
     ULONG debugFlags = 0;
-    if (Kernel::NtQueryInformationProcess(Kernel::NtCurrentProcess(), PROCESSINFOCLASS::ProcessDebugFlags, &debugFlags, sizeof(ULONG), NULL) == STATUS_SUCCESS)
+    if (Kernel::NtQueryInformationProcess(process, PROCESSINFOCLASS::ProcessDebugFlags, &debugFlags, sizeof(ULONG), NULL) == STATUS_SUCCESS)
     {
         if (debugFlags == 0) return true;
     }
@@ -30,7 +30,7 @@ bool Hades::AntiDebug::HasDetectedProcessDebugFlags(HANDLE process)
 bool Hades::AntiDebug::HasDetectedProcessDebugObject(HANDLE process)
 {
     HANDLE debugHandle = NULL;
-    if (Kernel::NtQueryInformationProcess(Kernel::NtCurrentProcess(), PROCESSINFOCLASS::ProcessDebugObjectHandle, &debugHandle, sizeof(HANDLE), NULL) == STATUS_SUCCESS)
+    if (Kernel::NtQueryInformationProcess(process, PROCESSINFOCLASS::ProcessDebugObjectHandle, &debugHandle, sizeof(HANDLE), NULL) == STATUS_SUCCESS)
     {
         if (debugHandle != NULL) return true;
     }
@@ -82,6 +82,11 @@ wchar_t* Hades::AntiDebug::GetParentProcessFileName(HANDLE process, bool include
     }
 
     return nullptr;
+}
+
+void Hades::AntiDebug::FreeWstring(wchar_t* wStr)
+{
+    HadesAPI::FreeWstring(wStr);
 }
 
 bool Hades::AntiDebug::TerminateParentProcess(int exitCode)

@@ -84,6 +84,12 @@ namespace Hades
 
 
 		/*
+		* Free memory buffer allocated by Hades library (eg: AntiDebug::GetProcessFileName)
+		*/
+		void FreeWstring(wchar_t* wStr);
+
+
+		/*
 		* Returns true if termination request succeed, otherwise it returns false.
 		* exitCode is the process exit reason.
 		* Can use this function to termintate the debugger process that debugging the current application.

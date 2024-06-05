@@ -17,7 +17,7 @@ SIZE_T Hades::WindowsAPI::VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMAT
 
 DWORD Hades::WindowsAPI::GetProcessId(HANDLE Process)
 {
-    PROCESS_BASIC_INFORMATION info{};
+    PROCESS_BASIC_INFORMATION info = {};
     if (Kernel::NtQueryInformationProcess(Process, PROCESSINFOCLASS::ProcessBasicInformation, &info, sizeof(PROCESS_BASIC_INFORMATION), nullptr) == STATUS_SUCCESS)
     {
         return (DWORD)info.UniqueProcessId;
@@ -28,7 +28,7 @@ DWORD Hades::WindowsAPI::GetProcessId(HANDLE Process)
 
 BOOL Hades::WindowsAPI::CheckRemoteDebuggerPresent(HANDLE hProcess, PBOOL pbDebuggerPresent)
 {
-    PROCESS_BASIC_INFORMATION info{};
+    PROCESS_BASIC_INFORMATION info = {};
     if (Kernel::NtQueryInformationProcess(hProcess, PROCESSINFOCLASS::ProcessBasicInformation, &info, sizeof(PROCESS_BASIC_INFORMATION), nullptr) == STATUS_SUCCESS)
     {
         if (info.PebBaseAddress && pbDebuggerPresent)
@@ -50,8 +50,8 @@ BOOL Hades::WindowsAPI::IsDebuggerPresent()
 HANDLE Hades::WindowsAPI::OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId)
 {
     HANDLE handle = NULL;
-    CLIENT_ID clientId{};
-    OBJECT_ATTRIBUTES objAttributes{};
+    CLIENT_ID clientId = {};
+    OBJECT_ATTRIBUTES objAttributes = {};
 
     InitializeObjectAttributes(&objAttributes, NULL, (bInheritHandle ? OBJ_INHERIT : NULL), NULL, NULL);
     clientId.UniqueProcess = (HANDLE)dwProcessId;

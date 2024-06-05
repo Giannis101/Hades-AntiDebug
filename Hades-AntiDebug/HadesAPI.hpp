@@ -10,6 +10,9 @@ namespace Hades
 		* You have to free the returned buffer with 'delete[]' when you done using it.
 		* process: handle of process.
 		* includeParentPath: whenever or not to return parent path with the file name or just the file name without path
+		* 
+		* Note: To free the string buffer returned by this function use HadesAPI::FreeWstring
+		* 
 		* Example:
 		*		with includeParentPath: "C:\\Users\\debug.exe"
 		*		without includeParentPath: "debug.exe"
@@ -32,5 +35,9 @@ namespace Hades
 		DWORD GetParentProcessProcessId();
 
 
+		/*
+		* Free memory buffer allocated by Hades library (eg: HadesAPI::GetProcessFileName)
+		*/
+		void FreeWstring(wchar_t* wStr);
 	}
 }

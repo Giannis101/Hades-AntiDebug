@@ -7,14 +7,10 @@
 
 wchar_t* Hades::HadesAPI::GetProcessFileName(HANDLE process, bool includeParentPath)
 {
-	//this looks like it works... ProcessImageFileNameWin32 have to write in stack for some reason.
-	WCHAR stackBuffer[MAX_PATH + 1];
-
-	UNICODE_STRING name;
-	name.Buffer = stackBuffer;
-	name.MaximumLength = sizeof(stackBuffer);
-	name.Length = 0;
-
+	//this looks like it works... ProcessImageFileNameWin32 has to write in stack for some reason.
+	WCHAR stackBuffer[MAX_PATH + 1] = { L'\0' };
+	UNICODE_STRING name = { 0, sizeof(stackBuffer), stackBuffer };
+	
 	//ProcessInformationLength is the total size of (UNICODE_STRING + stackBuffer) in bytes.
 	//It will zero the buffer automatically before write to it, so the string will be null-terminated.
 	if (Kernel::NtQueryInformationProcess(process, PROCESSINFOCLASS::ProcessImageFileNameWin32, &name, sizeof(stackBuffer) + sizeof(UNICODE_STRING), NULL) == STATUS_SUCCESS)
@@ -72,4 +68,9 @@ DWORD Hades::HadesAPI::GetParentProcessProcessId(HANDLE process)
 DWORD Hades::HadesAPI::GetParentProcessProcessId()
 {
 	return GetParentProcessProcessId(Kernel::NtCurrentProcess());
+}
+
+void Hades::HadesAPI::FreeWstring(wchar_t* wStr)
+{
+	if (wStr) delete wStr;
 }

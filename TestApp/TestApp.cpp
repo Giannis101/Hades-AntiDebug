@@ -105,62 +105,137 @@ wchar_t* Windows_GetParentProcessFileName()
 	return result;
 }
 
+//change console window background and text color
+void SetGameOverColors()
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_RED | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+}
+
+// run all hades checks, print result messages, return true if detect debugger using Hades otherwise return false
+bool RunHadesChecks()
+{
+	bool hades_hasDetectedProcessDebugFlags = Hades::AntiDebug::HasDetectedProcessDebugFlags();
+	bool hades_hasDetectedProcessDebugObject = Hades::AntiDebug::HasDetectedProcessDebugObject();
+	bool hades_hasDetectedHardwareBreakpoints = Hades::AntiDebug::HasDetectedHardwareBreakpoints();
+	bool hades_checkRemoteDebuggerPresent = false;							//checking for remote debugger present not recommented, attackers can still spoof it. It checking PEB
+	bool hades_isDebuggerPresent = Hades::WindowsAPI::IsDebuggerPresent();	//checking debugger present not recommented, attackers can still spoof it. It is checking PEB
+	std::wstring hades_parentProcessName_nameOnly = L"**UNKNOWN**";
+	std::wstring hades_parentProcessName_pathAndName = L"**UNKNOWN**";
 
 
+	BOOL hadesRemoteDebug = FALSE;
+	if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(Hades::WindowsAPI::GetCurrentProcess(), &hadesRemoteDebug))
+	{
+		hades_checkRemoteDebuggerPresent = (bool)hadesRemoteDebug;
+	}
+
+	if (wchar_t* debugName = Hades::AntiDebug::GetParentProcessFileName(false)) //ensure is not nullptr. Get the name of PE file without the parent path
+	{
+		hades_parentProcessName_nameOnly = debugName;
+		Hades::AntiDebug::FreeWstring(debugName); //this is the correct way to free the buffer allocated with Hades library
+	}
+
+	if (wchar_t* debugName = Hades::AntiDebug::GetParentProcessFileName(true)) //ensure is not nullptr. Get parent path with the name of the PE file
+	{
+		hades_parentProcessName_pathAndName = debugName;
+		Hades::AntiDebug::FreeWstring(debugName); //this is the correct way to free the buffer allocated with Hades library
+	}
+
+
+	PrintBool("Hades - HasDetectedProcessDebugFlags", hades_hasDetectedProcessDebugFlags);
+	PrintBool("Hades - HasDetectedProcessDebugObject", hades_hasDetectedProcessDebugObject);
+	PrintBool("Hades - HasDetectedHardwareBreakpoints", hades_hasDetectedHardwareBreakpoints);
+	PrintBool("Hades (WindowsAPI) - CheckRemoteDebuggerPresent", hades_checkRemoteDebuggerPresent);
+	PrintBool("Hades (WindowsAPI) - IsDebuggerPresent", hades_isDebuggerPresent);
+	std::wcout << "Hades - GetParentProcessFileName (without path): " << hades_parentProcessName_nameOnly << std::endl;
+	std::wcout << "Hades - GetParentProcessFileName (with path): " << hades_parentProcessName_pathAndName << std::endl;
+
+	return (
+		hades_hasDetectedProcessDebugFlags || hades_hasDetectedProcessDebugObject ||
+		hades_hasDetectedHardwareBreakpoints || hades_checkRemoteDebuggerPresent ||
+		hades_isDebuggerPresent
+	);
+
+	// could also add this check but no need and we not want to flag non-debuggers as debugger justbecause opened by a other application:
+	// hades_parentProcessName_nameOnly != L"explorer.exe"
+}
+
+// run the same checks as RunHadesChecks() but using Windows official headers-libraries directly, print result messages
+void RunCommonChecks()
+{
+	PrintBool("Windows - HasDetectedProcessDebugFlags", Windows_HasDetectedProcessDebugFlags());
+	PrintBool("Windows - HasDetectedProcessDebugObject", Windows_HasDetectedProcessDebugObject());
+	PrintBool("Windows - HasDetectedHardwareBreakpoints", Windows_HasDetectedHardwareBreakpoints());
+
+	BOOL normalRemoteDebug = FALSE;
+	if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &normalRemoteDebug)) //call CheckRemoteDebuggerPresent normally
+	{
+		PrintBool("Windows - CheckRemoteDebuggerPresent", (bool)normalRemoteDebug);
+	}
+
+	PrintBool("Windows - IsDebuggerPresent", IsDebuggerPresent());
+
+	if (wchar_t* debugName = Windows_GetParentProcessFileName())
+	{
+		std::wcout << "Windows - parent process name: " << debugName << std::endl;
+		delete[] debugName;
+	}
+	else
+	{
+		std::wcout << "Windows - parent process name: " << L"**UNKNOWN**" << std::endl;
+	}
+}
 
 int main()
 {
-	//This is a comparison between common anti-debug techniques and Hades.
-	//Hades is able to bypass and detect any private or public debug-hide tool.
-	//It can detect any usermode debugger like Windows, x64dbg, IDA and special debuging tools like Cheat engine's VEH (Hardware breakpoints, Int3 instructions)
+	// Hades examples located located at RunHadesChecks().
+
+	// This is a comparison between common anti-debug techniques by using Windows API without any library and same techniques by using Hades library.
+	// Hades is able to bypass and detect any private or public debug-hide tool silently, without trigger and catch any exception at runtime.
+	// This ensure that even if the hacker attach a debugger, will not cause halt of execution, so you can safely send an HTTP request to ban the user or terminate the debugger.
+	// It can detect presence of usermode debuggers and special debuging tools which using VEH. There are however some not so common debugging technques like using page guard but
+	// to detect this will need cause an exception. Will not provide this detection because if hacker attach any debugger this will halt the execution at a critical point, exposing
+	// the location of all debug detections. If you still want to add extra detections, call them a long interval and away from Hades detections
+
+	if (HWND consoleWindow = GetConsoleWindow())
+	{
+		SetWindowText(consoleWindow, TEXT("Try To Debug Me"));
+	}
+	
+	bool hasBeenDetected = false;
 
 	while (true)
 	{
-		std::cout << "Checking if debugger is present in this process" << std::endl << std::endl;
+		system("cls"); //clear console
+
+		if (hasBeenDetected)
+		{
+			SetGameOverColors();
+			std::cout << ">> GAME OVER. YOU HAVE BEEN DETECTED! <<" << std::endl;
+			std::cout << "      >> GOOD LUCK NEXT TIME <<" << std::endl << std::endl;
+		}
+		else
+		{
+			std::cout << "Nothing detected yet, but I'll keep an eye out for any suspicious activity." << std::endl << std::endl;
+		}
+		
 
 		///////////////////////////////////////////////////////////////  HADES  ///////////////////////////////////////////////////////////////
-		PrintBool("Hades - HasDetectedProcessDebugFlags", Hades::AntiDebug::HasDetectedProcessDebugFlags());
-		PrintBool("Hades - HasDetectedProcessDebugObject", Hades::AntiDebug::HasDetectedProcessDebugObject());
-		PrintBool("Hades - HasDetectedHardwareBreakpoints", Hades::AntiDebug::HasDetectedHardwareBreakpoints());
 
-		BOOL hadesRemoteDebug = FALSE;
-		if (Hades::WindowsAPI::CheckRemoteDebuggerPresent(Hades::WindowsAPI::GetCurrentProcess(), &hadesRemoteDebug)) //call CheckRemoteDebuggerPresent with Hades. Not recommented, attackers can still spoof it
-		{
-			PrintBool("Hades (WindowsAPI) - CheckRemoteDebuggerPresent", (bool)hadesRemoteDebug);
-		}
+		hasBeenDetected |= RunHadesChecks();
 
-		PrintBool("Hades (WindowsAPI) - IsDebuggerPresent", Hades::WindowsAPI::IsDebuggerPresent());
-
-		if (wchar_t* debugName = Hades::AntiDebug::GetParentProcessFileName())
-		{
-			std::wcout << "Hades - GetParentProcessFileName: " << debugName << std::endl;
-			delete[] debugName;
-		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		std::cout << std::endl << std::endl;
 
 		////////////////////////////////////////////////////////////  WINDOWS  ////////////////////////////////////////////////////////////////
-		PrintBool("Windows - HasDetectedProcessDebugFlags", Windows_HasDetectedProcessDebugFlags());
-		PrintBool("Windows - HasDetectedProcessDebugObject", Windows_HasDetectedProcessDebugObject());
-		PrintBool("Windows - HasDetectedHardwareBreakpoints", Windows_HasDetectedHardwareBreakpoints());
+		
+		RunCommonChecks();
 
-		BOOL normalRemoteDebug = FALSE;
-		if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &normalRemoteDebug)) //call CheckRemoteDebuggerPresent normally
-		{
-			PrintBool("Windows - CheckRemoteDebuggerPresent", (bool)normalRemoteDebug);
-		}
-
-		PrintBool("Windows - IsDebuggerPresent", IsDebuggerPresent());
-
-		if (wchar_t* debugName = Windows_GetParentProcessFileName())
-		{
-			std::wcout << "Windows - parent process name: " << debugName << std::endl;
-			delete[] debugName;
-		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		std::cout << std::endl << std::endl;
+
 
 		//a simple test to detect if a debugger-hide tool is currently used to hide the debugger
 		bool windowsDetectedDebug = Windows_HasDetectedProcessDebugFlags() || Windows_HasDetectedProcessDebugObject();
@@ -171,9 +246,8 @@ int main()
 			std::cout << "Debugger-hide tool/s detected" << std::endl;
 		}
 
-
-		Sleep(1000);
-		system("cls"); //clear console
+		
+		Sleep(1000); //pause execution for 1 second
 	}
 	return 0;
 }
